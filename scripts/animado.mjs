@@ -17,8 +17,9 @@ const item = JSON.parse(await readFile(file, 'utf8')).find(x => x.slug === slug)
 if (!item) throw new Error(`No encuentro «${slug}» en ${file}`);
 const dir = await jobDir(`anim-${slug}`);
 let audioSrc, captions, duration;
-if (hasKey('TTS')) {
-  const raw = path.join(dir, 'voice-raw.mp3');
+const rawVoice = path.join(dir, 'voice-raw.mp3');
+if (hasKey('TTS') || await exists(rawVoice)) {
+  const raw = rawVoice;
   if (!await exists(raw)) { console.log('Voz…'); await synthesizeVoice(`anim-${slug}`, item.narration); }
   const voice = path.join(dir, 'voice.wav');
   if (!await exists(voice)) await run('ffmpeg', ['-y', '-v', 'error', '-i', raw, '-af', `adelay=${START * 1000}:all=1,apad=pad_dur=${END_PAD}`, '-ar', '24000', '-ac', '1', voice]);
@@ -27,7 +28,12 @@ if (hasKey('TTS')) {
   const tfile = path.join(dir, 'transcription.json');
   let words;
   if (await exists(tfile)) words = JSON.parse(await readFile(tfile, 'utf8')).words;
-  else {
+  else if (!hasKey('WHISPER')) {
+    // Sin clave: transcripción local gratuita con faster-whisper.
+    console.log('Subtítulos (local)…');
+    await run('python3', ['-I', path.join(path.dirname(new URL(import.meta.url).pathname), 'transcribir.py'), voice, tfile, item.narration]);
+    words = JSON.parse(await readFile(tfile, 'utf8')).words;
+  } else {
     console.log('Subtítulos…');
     const client = new OpenAI({apiKey: process.env.WHISPER_API_KEY || process.env.OPENAI_API_KEY, maxRetries: 2});
     const tr = await client.audio.transcriptions.create({file: createReadStream(voice), model: 'whisper-1', language: 'es', response_format: 'verbose_json', timestamp_granularities: ['word'], prompt: item.narration});
