@@ -261,24 +261,15 @@ const loadImage = blob => new Promise((resolve, reject) => {
 });
 function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
-/** Prepara cada imagen una vez: fondo desenfocado (sin ctx.filter, compatible con Safari) y primer plano con bordes fundidos. */
-async function prepareScene(blob) {
-  const img = await loadImage(blob);
-  const bg = makeCanvas(W, H);
-  const tiny = makeCanvas(18, 32);
-  const tc = tiny.getContext('2d');
-  const cover = Math.max(18 / img.width, 32 / img.height);
-  tc.drawImage(img, (18 - img.width * cover) / 2, (32 - img.height * cover) / 2, img.width * cover, img.height * cover);
-  const bc = bg.getContext('2d');
-  bc.imageSmoothingEnabled = true; bc.imageSmoothingQuality = 'high';
-  bc.drawImage(tiny, -60, -60, W + 120, H + 120);
-  bc.fillStyle = 'rgba(0,0,0,.75)'; bc.fillRect(0, 0, W, H);
-
-  const FW = W, FH = 1520;
-  const fg = makeCanvas(FW, FH);
-  const fc = fg.getContext('2d');
-  const s = Math.min(FW / img.width, FH / img.height);
-  fc.drawImage(img, (FW - img.width * s) / 2, (FH - img.height * s) / 2, img.width * s, img.height * s);
+/** Lienzo del tamaño real de salida (escala q) en el que se dibuja con coordenadas lógicas 1080×1920. */
+function layer(q, w, h, draw) {
+  const c = makeCanvas(Math.max(1, Math.round(w * q)), Math.max(1, Math.round(h * q)));
+  const x = c.getContext('2d');
+  x.scale(q, q);
+  draw(x);
+  return c;
+}
+function fadeEdges(fc, FW, FH) {
   fc.globalCompositeOperation = 'destination-in';
   let g = fc.createLinearGradient(0, 0, 0, FH);
   g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.09, '#000'); g.addColorStop(.8, '#000'); g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -286,6 +277,27 @@ async function prepareScene(blob) {
   g = fc.createLinearGradient(0, 0, FW, 0);
   g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.07, '#000'); g.addColorStop(.93, '#000'); g.addColorStop(1, 'rgba(0,0,0,0)');
   fc.fillStyle = g; fc.fillRect(0, 0, FW, FH);
+}
+
+/** Prepara cada imagen una vez: fondo desenfocado (sin ctx.filter, compatible con Safari) y primer plano con bordes fundidos. */
+async function prepareScene(blob, q) {
+  const img = await loadImage(blob);
+  const tiny = makeCanvas(18, 32);
+  const cover = Math.max(18 / img.width, 32 / img.height);
+  tiny.getContext('2d').drawImage(img, (18 - img.width * cover) / 2, (32 - img.height * cover) / 2, img.width * cover, img.height * cover);
+  const bg = layer(q, W, H, bc => {
+    bc.imageSmoothingEnabled = true; bc.imageSmoothingQuality = 'high';
+    bc.drawImage(tiny, -60, -60, W + 120, H + 120);
+    bc.fillStyle = 'rgba(0,0,0,.75)'; bc.fillRect(0, 0, W, H);
+  });
+  const FH = 1520;
+  const fg = layer(q, W, FH, fc => {
+    const s = Math.min(W / img.width, FH / img.height);
+    fc.imageSmoothingQuality = 'high';
+    fc.drawImage(img, (W - img.width * s) / 2, (FH - img.height * s) / 2, img.width * s, img.height * s);
+    fadeEdges(fc, W, FH);
+  });
+  URL.revokeObjectURL(img.src);
   return {bg, fg};
 }
 
@@ -293,37 +305,85 @@ const clamp01 = x => Math.max(0, Math.min(1, x));
 const lerp = (a, b, p) => a + (b - a) * p;
 const ease = p => 1 - Math.pow(1 - p, 3);
 const FONT = '-apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif';
+const CAP_FONT = `900 84px ${FONT}`;
+const SPRITE_PAD = 56, SPRITE_TOP = 104, SPRITE_H = 160;
 
-function layoutCaption(ctx, caption) {
+/**
+ * Todo lo que no cambia de un fotograma a otro se dibuja una sola vez (fondo, viñeta, marca, título).
+ * Así cada fotograma solo compone imágenes ya hechas: el iPhone llega a 30 fps.
+ */
+function prepareStatic(p, q) {
+  const hl = HIGHLIGHT[p.accent], glow = GLOW[p.accent];
+  p.q = q;
+  p.base = layer(q, W, H, ctx => {
+    const g = ctx.createRadialGradient(W / 2, H * .38, 0, W / 2, H * .38, H * .75);
+    g.addColorStop(0, '#1b2a2c'); g.addColorStop(.55, '#0b1214'); g.addColorStop(1, '#05080a');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  });
+  p.glow = layer(q, W, H, ctx => {
+    const g = ctx.createRadialGradient(W * .48, H * .4, 0, W * .48, H * .4, W * .9);
+    g.addColorStop(0, glow + '40'); g.addColorStop(.45, glow + '12'); g.addColorStop(1, glow + '00');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  });
+  p.over = layer(q, W, H, ctx => {
+    let g = ctx.createRadialGradient(W / 2, H * .45, H * .3, W / 2, H * .45, H * .75);
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.65)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, 'rgba(0,0,0,.35)'); g.addColorStop(.14, 'rgba(0,0,0,0)'); g.addColorStop(.62, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.8)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    if (p.brand) {
+      ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 14 * q; ctx.shadowOffsetY = 2 * q;
+      ctx.fillStyle = hl; roundRect(ctx, 70, 90, 58, 58, 16); ctx.fill();
+      ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+      ctx.fillStyle = '#0b1214'; ctx.font = `900 34px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(p.brand.trim()[0].toUpperCase(), 99, 121);
+      ctx.shadowBlur = 14 * q; ctx.shadowOffsetY = 2 * q;
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.font = `800 34px ${FONT}`;
+      ctx.fillText(p.brand, 146, 121);
+    }
+  });
+  p.titleLayer = p.showTitle && p.title ? layer(q, W, 420, ctx => {
+    ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 20 * q; ctx.shadowOffsetY = 4 * q;
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.font = `900 62px ${FONT}`;
+    wrap(ctx, p.title, 900).forEach((line, i) => ctx.fillText(line, 70, (p.brand ? 190 : 120) + i * 68));
+  }) : null;
+  p.measure = makeCanvas(1, 1).getContext('2d');
+  p.measure.font = CAP_FONT;
+}
+/** Cada palabra se dibuja una vez (con su sombra) en un lienzo pequeño que luego solo se mueve y escala. */
+function wordSprite(p, text, width, color) {
+  return layer(p.q, width + SPRITE_PAD * 2, SPRITE_H, x => {
+    x.font = CAP_FONT; x.textBaseline = 'alphabetic';
+    x.shadowColor = 'rgba(0,0,0,.9)'; x.shadowBlur = 24 * p.q; x.shadowOffsetY = 6 * p.q;
+    x.fillStyle = color; x.fillText(text, SPRITE_PAD, SPRITE_TOP);
+  });
+}
+function layoutCaption(p, caption) {
   if (caption._lines) return caption._lines;
-  ctx.font = `900 84px ${FONT}`;
-  const space = ctx.measureText(' ').width;
+  const space = p.measure.measureText(' ').width;
   const lines = [[]];
   let width = 0;
   for (const w of caption.words) {
-    const ww = ctx.measureText(w.text).width;
+    const ww = p.measure.measureText(w.text).width;
     if (lines.at(-1).length && width + space + ww > 940) { lines.push([]); width = 0; }
     lines.at(-1).push({w, width: ww});
     width += (lines.at(-1).length > 1 ? space : 0) + ww;
   }
-  caption._lines = lines.map(l => ({items: l, width: l.reduce((a, x) => a + x.width, 0) + space * (l.length - 1), space}));
+  caption._lines = lines.map(items => ({items, space}));
   return caption._lines;
 }
 
 function drawFrame(ctx, t, p) {
-  const {scenes, captions, duration, accent, brand, title, showTitle, demo} = p;
-  const hl = HIGHLIGHT[accent], glow = GLOW[accent];
-  ctx.save();
-  // Fondo y foco de luz.
-  let g = ctx.createRadialGradient(W / 2, H * .38, 0, W / 2, H * .38, H * .75);
-  g.addColorStop(0, '#1b2a2c'); g.addColorStop(.55, '#0b1214'); g.addColorStop(1, '#05080a');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  const pulse = .55 + .15 * Math.sin(t * 1.3);
+  const {scenes, captions, duration, accent, demo} = p;
+  const hl = HIGHLIGHT[accent];
   const endFade = clamp01((duration - t) / 0.35);
-  ctx.globalAlpha = endFade;
+  ctx.globalAlpha = 1;
+  ctx.drawImage(p.base, 0, 0, W, H);
+  const pulse = .55 + .15 * Math.sin(t * 1.3);
 
   // Escenas con movimiento de cámara y fundidos.
-  const slot = duration / scenes.length;
+  const slot = duration / Math.max(1, scenes.length);
   scenes.forEach((sc, i) => {
     const start = i * slot, end = (i + 1) * slot, last = i === scenes.length - 1;
     const local = t - start, pr = clamp01(local / slot);
@@ -341,54 +401,37 @@ function drawFrame(ctx, t, p) {
     ctx.translate(W / 2 + tx, 110 + 760 + ty);
     ctx.rotate(rotZ);
     ctx.scale(scale * Math.cos(rotY), scale); // giro en Y aproximado
-    ctx.drawImage(sc.fg, -W / 2, -760);
+    ctx.drawImage(sc.fg, -W / 2, -760, W, 1520);
     ctx.restore();
   });
-  ctx.globalAlpha = endFade;
 
-  // Brillo, partículas, viñeta y degradados.
-  g = ctx.createRadialGradient(W * .48, H * .4, 0, W * .48, H * .4, W * .9);
-  g.addColorStop(0, glow + '40'); g.addColorStop(.45, glow + '12'); g.addColorStop(1, glow + '00');
-  ctx.globalAlpha = endFade * pulse; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  ctx.globalAlpha = endFade;
+  // Brillo, partículas y viñeta (ya preparados).
+  ctx.globalAlpha = endFade * pulse;
+  ctx.drawImage(p.glow, 0, 0, W, H);
+  ctx.fillStyle = '#fff6dc';
   for (let i = 0; i < 36; i++) {
     const x = ((i * 37.17) % 100) / 100 * W;
     const y = ((((i * 13.91 - t * (i % 3 + 1) * .6 + 200) % 100) + 100) % 100) / 100 * H;
+    const r = i % 6 ? 3 : 5;
     ctx.globalAlpha = endFade * (.08 + .22 * Math.sin(i + t * .5) ** 2);
-    ctx.fillStyle = '#fff6dc';
-    ctx.beginPath(); ctx.arc(x, y, i % 6 ? 1.6 : 2.6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillRect(x - r / 2, y - r / 2, r, r);
   }
   ctx.globalAlpha = endFade;
-  g = ctx.createRadialGradient(W / 2, H * .45, H * .3, W / 2, H * .45, H * .75);
-  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.65)');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, 'rgba(0,0,0,.35)'); g.addColorStop(.14, 'rgba(0,0,0,0)'); g.addColorStop(.62, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.8)');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-
-  // Marca y título.
-  ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 2;
-  if (brand) {
-    ctx.fillStyle = hl;
-    roundRect(ctx, 70, 90, 58, 58, 16); ctx.fill();
-    ctx.shadowBlur = 0; ctx.fillStyle = '#0b1214'; ctx.font = `900 34px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(brand.trim()[0].toUpperCase(), 99, 121);
-    ctx.shadowBlur = 14; ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.font = `800 34px ${FONT}`;
-    ctx.fillText(brand, 146, 121);
-  }
-  if (showTitle && title) {
+  ctx.drawImage(p.over, 0, 0, W, H);
+  if (p.titleLayer) {
     ctx.globalAlpha = endFade * clamp01(t / .6);
-    ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.font = `900 62px ${FONT}`;
-    wrap(ctx, title, 900).forEach((line, i) => ctx.fillText(line, 70, (brand ? 190 : 120) + i * 68));
-    ctx.globalAlpha = endFade;
+    ctx.drawImage(p.titleLayer, 0, 0, W, 420);
   }
 
   // Subtítulos: cada palabra entra desde abajo, crece y se ilumina al pronunciarse.
   const cap = captions.find(c => t >= c.start && t < c.end);
+  if (p.lastCap && p.lastCap !== cap) { // libera memoria de la frase anterior
+    p.lastCap.words.forEach(w => { w._white = w._hl = null; });
+  }
+  p.lastCap = cap;
   if (cap) {
-    const lines = layoutCaption(ctx, cap);
+    const lines = layoutCaption(p, cap);
     const out = clamp01((cap.end - t) / 0.12);
-    ctx.font = `900 84px ${FONT}`; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
     const lh = 97, top = 1560 - (lines.length - 1) * lh / 2;
     lines.forEach((line, li) => {
       // Solo se centran las palabras ya dichas: la frase crece desde el centro.
@@ -397,27 +440,22 @@ function drawFrame(ctx, t, p) {
       let x = W / 2 - shownWidth / 2;
       for (const {w, width} of shown) {
         const k = ease(clamp01((t - w.start + .04) / .2));
-        {
-          const active = t >= w.start && t < w.end + .05;
-          const sc = .88 + .12 * k + (active ? .04 : 0);
-          ctx.save();
-          ctx.globalAlpha = endFade * out * k;
-          ctx.translate(x + width / 2, top + li * lh + (1 - k) * 22);
-          ctx.scale(sc, sc);
-          ctx.shadowColor = 'rgba(0,0,0,.9)'; ctx.shadowBlur = 26 + (1 - k) * 30; ctx.shadowOffsetY = 6;
-          ctx.fillStyle = active ? hl : '#fff';
-          ctx.fillText(w.text, -width / 2, 0);
-          ctx.restore();
-        }
+        const active = t >= w.start && t < w.end + .05;
+        const sprite = active ? (w._hl ||= wordSprite(p, w.text, width, hl)) : (w._white ||= wordSprite(p, w.text, width, '#fff'));
+        const sc = .88 + .12 * k + (active ? .04 : 0);
+        const sw = width + SPRITE_PAD * 2;
+        ctx.globalAlpha = endFade * out * k;
+        ctx.setTransform(p.q * sc, 0, 0, p.q * sc, p.q * (x + width / 2), p.q * (top + li * lh + (1 - k) * 22));
+        ctx.drawImage(sprite, -sw / 2, -SPRITE_TOP, sw, SPRITE_H);
+        ctx.setTransform(p.q, 0, 0, p.q, 0, 0);
         x += width + line.space;
       }
     });
   }
-  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
   ctx.fillStyle = hl; ctx.globalAlpha = endFade * .85;
   ctx.fillRect(0, H - 6, W * clamp01(t / duration), 6);
-  if (demo) { ctx.globalAlpha = .4; ctx.fillStyle = '#fff'; ctx.font = `600 22px ${FONT}`; ctx.textAlign = 'right'; ctx.fillText('SIN VOZ', W - 60, H - 40); }
-  ctx.restore();
+  if (demo) { ctx.globalAlpha = .4; ctx.fillStyle = '#fff'; ctx.font = `600 22px ${FONT}`; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText('SIN VOZ', W - 60, H - 40); }
+  ctx.globalAlpha = 1;
 }
 function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 function wrap(ctx, text, max) {
@@ -451,9 +489,10 @@ async function makeVideo() {
     $('#result').hidden = true;
     try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {}
 
+    const q = Number(state.quality) || 1;
     setProgress(.02, 'Preparando imágenes…');
     const scenes = [];
-    for (const b of blobs) scenes.push(await prepareScene(b));
+    for (const b of blobs) scenes.push(await prepareScene(b, q));
 
     let audioBlob = null;
     if (state.voiceMode === 'tts') {
@@ -483,8 +522,8 @@ async function makeVideo() {
     }
     const params = {scenes, captions: groupCaptions(list, duration), duration, accent: state.accent, brand: state.brand.trim(), title: state.title, showTitle: state.showTitle, demo: !buffer};
 
+    prepareStatic(params, q);
     const canvas = $('#canvas');
-    const q = Number(state.quality) || 1;
     canvas.width = Math.round(W * q / 2) * 2; canvas.height = Math.round(H * q / 2) * 2;
     const ctx = canvas.getContext('2d');
     ctx.setTransform(q, 0, 0, q, 0, 0);
@@ -510,10 +549,13 @@ async function makeVideo() {
     const t0 = actx.currentTime + 0.15;
     source?.start(t0 + VOICE_START);
     let lastLabel = -1;
+    const stats = {draw: 0, frames: 0};
     await new Promise(resolve => {
       const loop = () => {
         const t = Math.max(0, actx.currentTime - t0);
+        const d0 = performance.now();
         drawFrame(ctx, Math.min(t, duration), params);
+        stats.draw += performance.now() - d0; stats.frames++;
         const pct = Math.round(t / duration * 100);
         if (pct !== lastLabel) { lastLabel = pct; setProgress(.15 + .85 * clamp01(t / duration), `Grabando… ${Math.min(100, pct)} % · no cierres la app`); }
         if (t >= duration) return resolve();
@@ -523,6 +565,7 @@ async function makeVideo() {
     });
     rec.stop();
     await stopped;
+    console.info(`Fotogramas dibujados: ${stats.frames} en ${duration.toFixed(1)} s (${(stats.frames / duration).toFixed(1)} fps), ${(stats.draw / Math.max(1, stats.frames)).toFixed(1)} ms por fotograma`);
     stream.getTracks().forEach(tr => tr.stop());
     const type = (rec.mimeType || mimeType || 'video/mp4').split(';')[0];
     const ext = type.includes('mp4') ? 'mp4' : 'webm';
@@ -601,6 +644,8 @@ async function init() {
   while (images.length < state.scenes.length) images.push(null);
   fillForm(); renderScenes(); showVoice();
   if (!apiKey()) toast('Consejo: pulsa «⚙️ Clave» para añadir tu clave de OpenAI y que la IA haga guion, imágenes y voz.', true);
-  drawFrame($('#canvas').getContext('2d'), 0, {scenes: [], captions: [], duration: 1, accent: state.accent, brand: state.brand, title: '', showTitle: false, demo: false});
+  const preview = {scenes: [], captions: [], duration: 1, accent: state.accent, brand: state.brand, title: '', showTitle: false, demo: false};
+  prepareStatic(preview, 1);
+  drawFrame($('#canvas').getContext('2d'), 0, preview);
 }
 init();
