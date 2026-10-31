@@ -1,0 +1,7 @@
+node_modules/
+.env
+public/jobs/*
+!public/jobs/.gitkeep
+output/*
+!output/.gitkeep
+.remotion/

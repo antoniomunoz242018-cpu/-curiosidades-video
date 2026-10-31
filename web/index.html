@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estudio de curiosidades</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="logo"><span>S</span> Estudio de curiosidades</div>
+    <div id="keys" class="keys" title="Claves de API detectadas en .env"></div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <button id="new-btn" class="btn primary block">+ Nuevo vídeo</button>
+      <h3>Proyectos</h3>
+      <ul id="job-list" class="job-list"></ul>
+    </aside>
+
+    <main>
+      <!-- Paso 1: tema -->
+      <section id="start" class="card">
+        <h1>¿Sobre qué curiosidad quieres un vídeo?</h1>
+        <p class="muted">Ejemplos: «Por qué el gancho del flexómetro está flojo», «Para qué sirve el agujero de la tapa del bolígrafo», «Por qué los aviones tienen ventanas redondas».</p>
+        <textarea id="topic" rows="2" maxlength="500" placeholder="Escribe el tema…"></textarea>
+        <div class="row">
+          <label>Escenas (imágenes)
+            <select id="scene-count"><option>1</option><option>2</option><option selected>3</option><option>4</option></select>
+          </label>
+          <span class="grow"></span>
+          <button id="manual-btn" class="btn">Escribir yo el guion</button>
+          <button id="ai-btn" class="btn primary">✨ Generar guion con IA</button>
+        </div>
+      </section>
+
+      <!-- Editor del proyecto -->
+      <div id="editor" hidden>
+        <section class="card">
+          <div class="section-head"><h2>1 · Guion</h2><button id="delete-btn" class="btn ghost danger">Borrar proyecto</button></div>
+          <label>Título <input id="title" maxlength="65"></label>
+          <label>Narración <span id="word-count" class="pill"></span>
+            <textarea id="narration" rows="7" maxlength="1400"></textarea>
+          </label>
+          <label>Texto para la publicación
+            <div class="copy-row"><textarea id="post-text" rows="2" maxlength="500" placeholder="El gancho de tu flexómetro se mueve justo lo que mide de grueso. No está descompuesto: es…"></textarea><button id="copy-btn" class="btn">Copiar</button></div>
+          </label>
+        </section>
+
+        <section class="card">
+          <div class="section-head"><h2>2 · Imágenes</h2><button id="add-scene" class="btn ghost">+ Escena</button></div>
+          <p class="muted">Se muestran en orden, repartidas a lo largo del vídeo, con movimiento de cámara y fundidos. Mejor en vertical, con el objeto sobre fondo oscuro.</p>
+          <div id="scenes" class="scenes"></div>
+        </section>
+
+        <section class="card two-col">
+          <div>
+            <h2>3 · Estilo</h2>
+            <label>Diseño
+              <select id="layout"><option value="foto">Foto realista (como el ejemplo)</option><option value="clasico">Ilustración animada</option></select>
+            </label>
+            <label>Color de resaltado <select id="accent"></select></label>
+            <label id="object-wrap">Ilustración <select id="object"></select></label>
+            <label>Marca / nombre de tu página <input id="brand" maxlength="40" placeholder="Opcional, p. ej. S de saber"></label>
+            <label class="check"><input type="checkbox" id="show-title"> Mostrar el título en pantalla</label>
+          </div>
+          <div>
+            <h2>4 · Voz</h2>
+            <label class="radio"><input type="radio" name="voice" value="tts"> Voz con IA <small id="tts-note" class="muted"></small></label>
+            <label class="radio"><input type="radio" name="voice" value="upload"> Mi propia voz</label>
+            <div id="upload-box" class="upload-box">
+              <div class="row">
+                <button id="rec-btn" class="btn">🎙️ Grabar</button>
+                <label class="btn">📁 Subir audio<input id="voice-file" type="file" accept="audio/*" hidden></label>
+              </div>
+              <p id="voice-status" class="muted">Lee la narración en 30–50 s; se ajusta a 40 s.</p>
+              <audio id="voice-preview" controls hidden></audio>
+            </div>
+            <label class="radio"><input type="radio" name="voice" value="none"> Sin voz (solo subtítulos)</label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>5 · Vídeo</h2>
+          <div class="row">
+            <button id="render-btn" class="btn primary big">🎬 Generar vídeo</button>
+            <span id="save-state" class="muted"></span>
+          </div>
+          <div id="progress" class="progress" hidden><div></div><span></span></div>
+          <div id="result" class="result" hidden>
+            <video id="video" controls playsinline></video>
+            <a id="download" class="btn primary" download>⬇️ Descargar MP4</a>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
