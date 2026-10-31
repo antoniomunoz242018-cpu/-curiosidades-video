@@ -105,7 +105,19 @@ async function generateImage(i) {
   needKey('generar imágenes');
   const prompt = state.scenes[i].prompt.trim();
   if (!prompt) throw new Error('Describe la imagen de esta escena.');
-  const data = await openai('images/generations', {json: {model: 'gpt-image-1', prompt: `${prompt}. ${IMAGE_STYLE}`, size: '1024x1536', quality: 'medium', n: 1}});
+  const full = `${prompt}. ${IMAGE_STYLE}`;
+  let data;
+  if (localStorage.getItem('image_model') !== 'dall-e-3') {
+    try {
+      data = await openai('images/generations', {json: {model: 'gpt-image-1', prompt: full, size: '1024x1536', quality: 'medium', n: 1}});
+    } catch (e) {
+      // gpt-image-1 exige verificar la organización en OpenAI; mientras tanto se usa DALL·E 3.
+      if (!/verif|organization|does not have access|model_not_found|not found/i.test(e.message)) throw e;
+      localStorage.setItem('image_model', 'dall-e-3');
+      toast('Tu cuenta aún no puede usar gpt-image-1 (falta verificar la organización en OpenAI). Uso DALL·E 3 en su lugar.', true);
+    }
+  }
+  data ??= await openai('images/generations', {json: {model: 'dall-e-3', prompt: full.slice(0, 3900), size: '1024x1792', quality: 'standard', response_format: 'b64_json', n: 1}});
   const b64 = data.data?.[0]?.b64_json;
   if (!b64) throw new Error('No llegó la imagen. Inténtalo de nuevo.');
   const bin = atob(b64), bytes = new Uint8Array(bin.length);
