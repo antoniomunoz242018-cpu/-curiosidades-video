@@ -61,7 +61,7 @@ export const PopCaptions: React.FC<{captions: Caption[]; time: number; highlight
 };
 
 /** Gancho: texto grande en recuadros amarillos durante los primeros 3 s. */
-const Hook: React.FC<{text: string; time: number; color: string}> = ({text, time, color}) => {
+export const Hook: React.FC<{text: string; time: number; color: string}> = ({text, time, color}) => {
   const k = interpolate(time, [0, 0.25], [0, 1], {...clamp, easing: t => 1 - Math.pow(1 - t, 3)});
   const out = interpolate(time, [2.9, 3.2], [1, 0], clamp);
   return <div style={{position: 'absolute', top: 230, left: 60, right: 60, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: out, transform: `scale(${1.25 - 0.25 * k})`}}>
@@ -71,7 +71,7 @@ const Hook: React.FC<{text: string; time: number; color: string}> = ({text, time
   </div>;
 };
 
-const highlightColor = {cyan: '#7ef0ff', violet: '#d7b8ff', amber: '#ffd84d'};
+export const highlightColor = {cyan: '#7ef0ff', violet: '#d7b8ff', amber: '#ffd84d'};
 const glowColor = {cyan: '#4fd6ff', violet: '#a77bff', amber: '#ffb347'};
 
 export const PhotoLayout: React.FC<VideoProps> = (props) => {

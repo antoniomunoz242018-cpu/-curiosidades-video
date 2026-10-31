@@ -6,7 +6,9 @@ export type VideoProps = {
   object: 'planet' | 'atom' | 'bulb' | 'brain' | 'crystal' | 'ocean';
   accent: 'cyan' | 'violet' | 'amber';
   /** 'foto': imágenes realistas a pantalla completa (estilo curiosidades de objetos). 'clasico': ilustración SVG. */
-  layout?: 'foto' | 'clasico';
+  layout?: 'foto' | 'clasico' | 'animacion';
+  /** Escena animada con código (src/scenes), para layout 'animacion'. */
+  scene?: string;
   /** Rutas relativas a public/ (p. ej. jobs/ID/scene-0.png), mostradas en orden repartidas en el tiempo. */
   images?: string[];
   /** Marca opcional en la esquina superior (nombre de la página). */

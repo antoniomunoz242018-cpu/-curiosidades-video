@@ -2,6 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {AnimatedObject} from './Object';
 import {PhotoLayout} from './PhotoLayout';
+import {AnimatedLayout} from './AnimatedLayout';
 import type {VideoProps} from './types';
 const palette = {cyan: '#67e8f9', violet: '#c4a0ff', amber: '#fcd879'};
 export const Video: React.FC<VideoProps> = (props) => {
@@ -12,6 +13,12 @@ export const Video: React.FC<VideoProps> = (props) => {
   const entrance = spring({frame, fps, config: {damping: 18, stiffness: 70}});
   const endFade = interpolate(frame, [durationInFrames - 10, durationInFrames - 1], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const caption = props.captions.find(c => time >= c.start && time < c.end);
+  if (props.layout === 'animacion' && props.scene) {
+    return <AbsoluteFill>
+      {props.audioSrc && <Audio src={staticFile(props.audioSrc)}/>}
+      <AnimatedLayout {...props}/>
+    </AbsoluteFill>;
+  }
   if (props.layout === 'foto' && props.images?.length) {
     return <AbsoluteFill>
       {props.audioSrc && <Audio src={staticFile(props.audioSrc)}/>}
