@@ -27,8 +27,8 @@ export async function renderVideo(propsFile, outputFile, {onProgress} = {}) {
     },
   });
   try {
-    // AAC puede añadir muestras de relleno: fijar el contenedor a 40 s.
-    await run('ffmpeg', ['-y', '-v', 'error', '-i', rawOutput, '-t', '40', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputFile]);
+    // AAC puede añadir muestras de relleno: fijar el contenedor a la duración exacta.
+    await run('ffmpeg', ['-y', '-v', 'error', '-i', rawOutput, '-t', String(inputProps.durationInSeconds ?? 40), '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputFile]);
   } finally { await rm(rawOutput, {force: true}); }
   console.log(`MP4: ${outputFile}`);
 }

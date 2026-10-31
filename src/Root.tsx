@@ -6,4 +6,5 @@ const defaults: VideoProps = {
   title: 'El universo tiene mucho que contar', object: 'planet', accent: 'cyan',
   narration: '', captions: [], demo: true,
 };
-export const Root = () => <Composition id="Curiosidad" component={Video} width={1080} height={1920} fps={30} durationInFrames={1200} defaultProps={defaults}/>;
+export const Root = () => <Composition id="Curiosidad" component={Video} width={1080} height={1920} fps={30} durationInFrames={1200} defaultProps={defaults}
+  calculateMetadata={({props}) => ({durationInFrames: Math.max(30, Math.round((props.durationInSeconds ?? 40) * 30))})}/>;

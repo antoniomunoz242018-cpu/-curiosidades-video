@@ -12,6 +12,10 @@ export type VideoProps = {
   /** Marca opcional en la esquina superior (nombre de la página). */
   brand?: string;
   showTitle?: boolean;
+  /** Texto grande en pantalla los primeros 3 s. */
+  hook?: string;
+  /** Duración total; si falta, 40 s. */
+  durationInSeconds?: number;
   audioSrc?: string;
   captions: Caption[];
   demo: boolean;

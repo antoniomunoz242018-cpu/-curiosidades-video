@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Caption, VideoProps} from './types';
 
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
@@ -17,8 +17,9 @@ const Scene: React.FC<{src: string; index: number; start: number; end: number; t
     last ? 1 : interpolate(time, [end, end + FADE], [1, 0], clamp),
   );
   if (opacity <= 0) return null;
-  const pop = index === 0 ? spring({frame: Math.round(local * fps), fps, config: {damping: 16, stiffness: 60}}) : 1;
-  const scale = (1.04 + p * 0.14) * (0.92 + 0.08 * pop);
+  // Primera escena: arranca muy cerca y se aleja de golpe para que haya movimiento desde el primer fotograma.
+  const pop = index === 0 ? interpolate(local, [0, 0.7], [0, 1], {...clamp, easing: t => 1 - Math.pow(1 - t, 3)}) : 1;
+  const scale = (1.04 + p * 0.14) * (1.35 - 0.35 * pop);
   const tx = dir * interpolate(p, [0, 1], [-28, 28]);
   const ty = interpolate(p, [0, 1], [18, -22]) + Math.sin(time * 1.1) * 6;
   const rotY = dir * interpolate(p, [0, 1], [5, -5]);
@@ -59,6 +60,17 @@ export const PopCaptions: React.FC<{captions: Caption[]; time: number; highlight
   </div>;
 };
 
+/** Gancho: texto grande en recuadros amarillos durante los primeros 3 s. */
+const Hook: React.FC<{text: string; time: number; color: string}> = ({text, time, color}) => {
+  const k = interpolate(time, [0, 0.25], [0, 1], {...clamp, easing: t => 1 - Math.pow(1 - t, 3)});
+  const out = interpolate(time, [2.9, 3.2], [1, 0], clamp);
+  return <div style={{position: 'absolute', top: 230, left: 60, right: 60, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: out, transform: `scale(${1.25 - 0.25 * k})`}}>
+    <div style={{textAlign: 'center', fontSize: 92, lineHeight: 1.13, fontWeight: 900, letterSpacing: -1, fontFamily: '"Arial Black", "Helvetica Neue", Arial, sans-serif'}}>
+      <span style={{background: color, color: '#0b1214', padding: '0 30px', borderRadius: 18, boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone', boxShadow: '0 8px 30px rgba(0,0,0,.6)'}}>{text.toUpperCase()}</span>
+    </div>
+  </div>;
+};
+
 const highlightColor = {cyan: '#7ef0ff', violet: '#d7b8ff', amber: '#ffd84d'};
 const glowColor = {cyan: '#4fd6ff', violet: '#a77bff', amber: '#ffb347'};
 
@@ -86,7 +98,8 @@ export const PhotoLayout: React.FC<VideoProps> = (props) => {
         <span style={{width: 58, height: 58, borderRadius: 16, background: highlightColor[props.accent], color: '#0b1214', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, fontWeight: 900}}>{props.brand.trim()[0]?.toUpperCase()}</span>
         {props.brand}
       </div>}
-      {props.showTitle && <div style={{position: 'absolute', top: props.brand ? 190 : 120, left: 70, right: 70, fontSize: 62, lineHeight: 1.08, fontWeight: 900, letterSpacing: -1.5, textShadow: '0 4px 20px #000', opacity: interpolate(time, [0, .6], [0, 1], clamp)}}>{props.title}</div>}
+      {props.showTitle && <div style={{position: 'absolute', top: props.brand ? 190 : 120, left: 70, right: 70, fontSize: 62, lineHeight: 1.08, fontWeight: 900, letterSpacing: -1.5, textShadow: '0 4px 20px #000', opacity: props.hook ? interpolate(time, [3.2, 3.7], [0, 1], clamp) : interpolate(time, [0, .6], [0, 1], clamp)}}>{props.title}</div>}
+      {props.hook && time < 3.2 && <Hook text={props.hook} time={time} color={highlightColor[props.accent]}/>}
       <PopCaptions captions={props.captions} time={time} highlight={highlightColor[props.accent]} top={1430}/>
       <div style={{position: 'absolute', bottom: 0, left: 0, height: 6, width: `${frame / (durationInFrames - 1) * 100}%`, background: highlightColor[props.accent], opacity: .85}}/>
       {props.demo && <div style={{position: 'absolute', bottom: 40, right: 60, color: '#ffffff66', fontSize: 22, letterSpacing: 3}}>DEMO · SIN VOZ</div>}
