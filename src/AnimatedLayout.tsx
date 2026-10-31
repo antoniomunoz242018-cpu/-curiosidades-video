@@ -4,10 +4,24 @@ import type {VideoProps} from './types';
 import type {SceneProps} from './scenes/types';
 import {Hook, PopCaptions, highlightColor} from './PhotoLayout';
 import {VentanasAvion} from './scenes/VentanasAvion';
+import {ArrozSalero} from './scenes/ArrozSalero';
+import {FlechaGasolina} from './scenes/FlechaGasolina';
+import {MesitaPizza} from './scenes/MesitaPizza';
+import {TeclasFJ} from './scenes/TeclasFJ';
+import {AgujeroVentana} from './scenes/AgujeroVentana';
+import {LucesAvion} from './scenes/LucesAvion';
+import {BolsilloJeans} from './scenes/BolsilloJeans';
 
 /** Escenas animadas con código (sin imágenes). Para añadir un tema nuevo, crea su componente en src/scenes/ y regístralo aquí. */
 export const SCENES: Record<string, React.FC<SceneProps>> = {
   'ventanas-redondas': VentanasAvion,
+  'arroz-salero': ArrozSalero,
+  'flecha-gasolina': FlechaGasolina,
+  'mesita-pizza': MesitaPizza,
+  'teclas-f-j': TeclasFJ,
+  'agujero-ventana-avion': AgujeroVentana,
+  'luces-avion': LucesAvion,
+  'bolsillo-jeans': BolsilloJeans,
 };
 
 export const AnimatedLayout: React.FC<VideoProps> = (props) => {
