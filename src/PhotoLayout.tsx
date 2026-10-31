@@ -43,7 +43,7 @@ export const PopCaptions: React.FC<{captions: Caption[]; time: number; highlight
   const out = interpolate(time, [caption.end - 0.12, caption.end], [1, 0], clamp);
   return <div style={{position: 'absolute', top, left: 60, right: 60, minHeight: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: out}}>
     <div style={{textAlign: 'center', fontSize: 84, lineHeight: 1.15, fontWeight: 900, letterSpacing: -1.5, fontFamily: '"Arial Black", "Helvetica Neue", Arial, sans-serif'}}>
-      {caption.words.map((w, i) => {
+      {caption.words.filter(w => time >= w.start - 0.04).map((w, i) => {
         const k = interpolate(time, [w.start - 0.04, w.start + 0.16], [0, 1], clamp);
         const active = time >= w.start && time < w.end + 0.05;
         return <React.Fragment key={i}>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Curiosidades">
+  <meta name="theme-color" content="#0b1214">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="icon" href="icon.svg">
+  <title>Estudio de curiosidades</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="logo"><span>S</span> Curiosidades</div>
+    <button id="settings-btn" class="btn ghost small">⚙️ Clave</button>
+  </header>
+
+  <main>
+    <!-- Ajustes: clave de OpenAI guardada solo en este teléfono -->
+    <section id="settings" class="card" hidden>
+      <h2>Clave de OpenAI</h2>
+      <p class="muted">Se guarda solo en este iPhone (no se envía a ningún otro sitio que no sea OpenAI). Consíguela en platform.openai.com → API keys. Sin clave puedes usar la app escribiendo el guion, subiendo fotos y grabando tu voz.</p>
+      <input id="api-key" type="password" autocomplete="off" placeholder="sk-…">
+      <div class="row">
+        <button id="save-key" class="btn primary">Guardar</button>
+        <button id="clear-key" class="btn ghost danger">Borrar clave</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>1 · Tema</h2>
+      <textarea id="topic" rows="2" maxlength="500" placeholder="Ej.: Por qué el gancho del flexómetro está flojo"></textarea>
+      <div class="row">
+        <label class="inline">Escenas
+          <select id="scene-count"><option>1</option><option>2</option><option selected>3</option><option>4</option></select>
+        </label>
+        <button id="ai-script" class="btn primary grow">✨ Escribir guion con IA</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2 · Guion</h2>
+      <label>Título <input id="title" maxlength="65" placeholder="Título del vídeo"></label>
+      <label>Narración <span id="word-count" class="pill"></span>
+        <textarea id="narration" rows="8" maxlength="1400" placeholder="Lo que dice la voz (unas 90–100 palabras ≈ 40 s)."></textarea>
+      </label>
+      <label>Texto para la publicación
+        <textarea id="post-text" rows="3" maxlength="500" placeholder="El gancho de tu flexómetro se mueve justo lo que mide de grueso. No está descompuesto: es…"></textarea>
+      </label>
+      <button id="copy-post" class="btn small">📋 Copiar texto</button>
+    </section>
+
+    <section class="card">
+      <div class="head"><h2>3 · Imágenes</h2><button id="add-scene" class="btn ghost small">+ Escena</button></div>
+      <p class="muted">Se muestran en orden con movimiento de cámara. Mejor verticales, con el objeto sobre fondo oscuro.</p>
+      <div id="scenes" class="scenes"></div>
+    </section>
+
+    <section class="card">
+      <h2>4 · Voz</h2>
+      <label class="radio"><input type="radio" name="voice" value="tts" checked> Voz con IA
+        <select id="tts-voice" class="mini"><option value="nova">Nova</option><option value="shimmer">Shimmer</option><option value="alloy">Alloy</option><option value="echo">Echo</option><option value="onyx">Onyx</option><option value="fable">Fable</option></select>
+      </label>
+      <label class="radio"><input type="radio" name="voice" value="mine"> Mi propia voz</label>
+      <div id="mine-box" class="sub" hidden>
+        <div class="row">
+          <button id="rec-btn" class="btn">🎙️ Grabar</button>
+          <label class="btn">📁 Subir audio<input id="voice-file" type="file" accept="audio/*" hidden></label>
+        </div>
+        <p id="voice-status" class="muted">Lee la narración en voz alta.</p>
+        <audio id="voice-preview" controls hidden></audio>
+      </div>
+      <label class="radio"><input type="radio" name="voice" value="none"> Sin voz (solo subtítulos)</label>
+    </section>
+
+    <section class="card">
+      <h2>5 · Estilo</h2>
+      <label>Color de resaltado
+        <select id="accent"><option value="amber">Amarillo</option><option value="cyan">Cian</option><option value="violet">Violeta</option></select>
+      </label>
+      <label>Nombre de tu página <input id="brand" maxlength="40" placeholder="Opcional, p. ej. S de saber"></label>
+      <label class="radio"><input type="checkbox" id="show-title"> Mostrar el título en pantalla</label>
+      <label>Calidad
+        <select id="quality"><option value="1">Alta · 1080×1920</option><option value="0.6667">Normal · 720×1280 (más rápido)</option></select>
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>6 · Vídeo</h2>
+      <p class="muted">El vídeo se graba en tiempo real: deja la pantalla encendida y la app abierta hasta que termine.</p>
+      <button id="make-btn" class="btn primary big block">🎬 Crear vídeo</button>
+      <div id="progress" class="progress" hidden><div></div><span></span></div>
+      <div class="stage"><canvas id="canvas" width="1080" height="1920"></canvas></div>
+      <div id="result" hidden>
+        <video id="video" controls playsinline></video>
+        <button id="save-btn" class="btn primary big block">💾 Guardar / compartir vídeo</button>
+        <a id="download" class="btn block" download>⬇️ Descargar archivo</a>
+      </div>
+    </section>
+
+    <p class="muted center"><button id="reset-btn" class="btn ghost danger small">Empezar un vídeo nuevo</button></p>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="app.js" type="module"></script>
+</body>
+</html>

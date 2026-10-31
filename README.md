@@ -2,6 +2,17 @@
 
 App web local + pipeline con Remotion para crear vídeos de curiosidades **1080 × 1920, 30 fps, 40 s** al estilo de las páginas de datos curiosos: un objeto realista (render 3D) sobre fondo oscuro con foco de luz, movimiento de cámara lento, subtítulos grandes que aparecen palabra a palabra y voz en español.
 
+## 📱 Versión para iPhone (sin computadora)
+
+La carpeta `docs/` es una app que funciona entera en Safari: escribe el guion, genera las imágenes y la voz con tu clave de OpenAI (que se guarda solo en el teléfono) y graba el vídeo en el propio iPhone. Se publica gratis con GitHub Pages:
+
+1. En GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, rama `claude/video-generator-app-xkkn8n` (o `main` si la fusionas), carpeta **`/docs`** → **Save**.
+2. Al cabo de 1–2 minutos abre `https://antoniomunoz242018-cpu.github.io/-curiosidades-video/` en Safari.
+3. Compartir → **Añadir a pantalla de inicio** para tenerla como app.
+4. Pulsa **⚙️ Clave** y pega tu clave de OpenAI (platform.openai.com → API keys).
+
+El vídeo se graba en tiempo real (≈40 s): deja la pantalla encendida y la app delante hasta que termine. Luego **💾 Guardar / compartir → Guardar vídeo** lo deja en Fotos. La duración se adapta a la voz.
+
 ## Inicio rápido (app web)
 
 ```bash
