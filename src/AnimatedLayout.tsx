@@ -18,6 +18,7 @@ import {BancoPlastico} from './scenes/BancoPlastico';
 import {MonedasRanuras} from './scenes/MonedasRanuras';
 import {Garrafon} from './scenes/Garrafon';
 import {PruebaUna} from './scenes/PruebaUna';
+import {MotoGPLlantas} from './scenes/MotoGPLlantas';
 
 /**
  * Escenas animadas con código (sin imágenes). Para añadir un tema nuevo, crea su componente en src/scenes/
@@ -39,6 +40,7 @@ export const SCENES: Record<string, Meta> = {
   'monedas-ranuras': {C: MonedasRanuras, climax: (c, d) => beat(c, 'limaban', d * .24) + .6},
   'garrafon': {C: Garrafon, climax: (c, d) => beat(c, 'doblaria', d * .26) + .2},
   'prueba-una': {C: PruebaUna, climax: (c, d) => beat(c, 'linterna', d * .8) + .5},
+  'motogp-llantas': {C: MotoGPLlantas, climax: () => 2.6},
 };
 /** Duración del avance inicial con el clímax antes de que empiece la historia. */
 export const TEASER = 1.4;
