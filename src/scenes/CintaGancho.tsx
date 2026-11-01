@@ -48,7 +48,7 @@ export const CintaGancho: React.FC<SceneProps> = ({time: t, captions, duration})
   return <Stage t={t}>
     {/* 1. El gancho se mueve */}
     <Shot t={t} from={-1} to={T.fuera} cy={760}>
-      <g transform={`translate(540 ${BY}) scale(${1 + .6 * prog(t, T.grosor - .2, T.grosor + .8)}) translate(-${170 + 200 * prog(t, T.grosor - .2, T.grosor + .8)} -${BY})`}>
+      <g transform={`translate(540 ${BY}) scale(${1.5 + .6 * prog(t, T.grosor - .2, T.grosor + .8)}) translate(-${450 - 166 * prog(t, T.grosor - .2, T.grosor + .8)} -${BY})`}>
         <Tape x0={170} slide={wiggle} glowSlot={prog(t, T.grosor, T.grosor + .5)}/>
       </g>
       {window01(t, T.grosor + .4, T.fuera) > 0 && <g opacity={window01(t, T.grosor + .4, T.fuera)}>
