@@ -61,10 +61,10 @@ export const PopCaptions: React.FC<{captions: Caption[]; time: number; highlight
 };
 
 /** Gancho: texto grande en recuadros amarillos durante los primeros 3 s. */
-export const Hook: React.FC<{text: string; time: number; color: string}> = ({text, time, color}) => {
+export const Hook: React.FC<{text: string; time: number; color: string; top?: number}> = ({text, time, color, top = 230}) => {
   const k = interpolate(time, [0, 0.25], [0, 1], {...clamp, easing: t => 1 - Math.pow(1 - t, 3)});
   const out = interpolate(time, [2.9, 3.2], [1, 0], clamp);
-  return <div style={{position: 'absolute', top: 230, left: 60, right: 60, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: out, transform: `scale(${1.25 - 0.25 * k})`}}>
+  return <div style={{position: 'absolute', top, left: 60, right: 60, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: out, transform: `scale(${1.25 - 0.25 * k})`}}>
     <div style={{textAlign: 'center', fontSize: 92, lineHeight: 1.13, fontWeight: 900, letterSpacing: -1, fontFamily: '"Arial Black", "Helvetica Neue", Arial, sans-serif'}}>
       <span style={{background: color, color: '#0b1214', padding: '0 30px', borderRadius: 18, boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone', boxShadow: '0 8px 30px rgba(0,0,0,.6)'}}>{text.toUpperCase()}</span>
     </div>

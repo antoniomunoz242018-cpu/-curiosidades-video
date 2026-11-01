@@ -16,6 +16,8 @@ export type VideoProps = {
   showTitle?: boolean;
   /** Texto grande en pantalla los primeros 3 s. */
   hook?: string;
+  /** Zonas seguras para TikTok/YouTube/Facebook: subtítulos más arriba y marca más abajo. */
+  safe?: boolean;
   /** Duración total; si falta, 40 s. */
   durationInSeconds?: number;
   audioSrc?: string;

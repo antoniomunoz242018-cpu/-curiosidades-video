@@ -37,7 +37,7 @@ if (hasKey('TTS') || await exists(rawVoice)) {
   const tfile = path.join(dir, 'transcription.json');
   let words;
   if (await exists(tfile)) words = JSON.parse(await readFile(tfile, 'utf8')).words;
-  else if (!hasKey('WHISPER')) {
+  else if (!hasKey('WHISPER') || process.env.LOCAL_WHISPER !== '0') {
     // Sin clave: transcripción local gratuita con faster-whisper.
     console.log('Subtítulos (local)…');
     await run('python3', ['-I', path.join(path.dirname(new URL(import.meta.url).pathname), 'transcribir.py'), voice, tfile, item.narration]);
@@ -58,6 +58,6 @@ if (hasKey('TTS') || await exists(rawVoice)) {
   captions = estimatedCaptions(item.narration, {start: START, span, duration});
 }
 const props = {title: item.title, narration: item.narration, object: 'bulb', accent: item.accent || 'amber', layout: 'animacion', scene: slug,
-  images: [], brand: item.brand ?? 'No Es Casualidad', showTitle: false, hook: item.hook, captions, durationInSeconds: duration, demo: !audioSrc, ...(audioSrc ? {audioSrc} : {})};
+  images: [], brand: item.brand ?? 'No Es Casualidad', showTitle: false, hook: item.hook, safe: !!item.titles, captions, durationInSeconds: duration, demo: !audioSrc, ...(audioSrc ? {audioSrc} : {})};
 const propsFile = await savePropsFile(`anim-${slug}`, props);
 await renderVideo(propsFile, path.join(OUTPUT_DIR, `${process.env.OUT_PREFIX || 'animado-'}${slug}${audioSrc ? '' : '-preview'}.mp4`));
