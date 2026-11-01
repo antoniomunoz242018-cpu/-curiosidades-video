@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {interpolate} from 'remotion';
 import type {Caption} from '../types';
-import {beat, clamp, easeOut, prog, window01} from './helpers';
+import {beat, clamp, easeOut, prog, window01, TeaserContext} from './helpers';
 
 export const RED = '#ff4d4d', GREEN = '#3ddc97', CYAN = '#5fe3ff', YELLOW = '#ffd84d', INK = '#0b1214';
 
@@ -32,7 +32,9 @@ export const Stage: React.FC<{t: number; top?: string; mid?: string; children: R
 /** Letrero tipo píldora que aparece con un pequeño rebote. */
 export const Chip: React.FC<{text: string; y: number; t: number; at: number; until?: number; color?: string; ink?: string; x?: number; size?: number}> =
   ({text, y, t, at: at0, until = 1e9, color = '#ffffff', ink = INK, x = 540, size = 40}) => {
-    // Los letreros de arriba esperan a que desaparezca el gancho (primeros 3,2 s).
+    // Los letreros de arriba esperan a que desaparezca el gancho (primeros 3,2 s) y no salen en el avance.
+    const teaser = useContext(TeaserContext);
+    if (teaser && y < 560) return null;
     const at = y < 560 ? Math.max(at0, 3.25) : at0;
     if (at >= until) return null;
     const o = window01(t, at, until, .3);

@@ -1,3 +1,4 @@
+import {createContext} from 'react';
 import {interpolate} from 'remotion';
 import type {Caption} from '../types';
 
@@ -19,3 +20,6 @@ export function beat(captions: Caption[], key: string, fallback: number, after =
 export const prog = (t: number, a: number, b: number, ease = easeInOut) => ease(interpolate(t, [a, Math.max(a + 0.001, b)], [0, 1], clamp));
 /** Visible entre a y b con fundidos de `f` segundos. */
 export const window01 = (t: number, a: number, b: number, f = 0.35) => Math.min(interpolate(t, [a, a + f], [0, 1], clamp), interpolate(t, [b - f, b], [1, 0], clamp));
+
+/** true durante el avance inicial (clímax): los letreros de arriba se ocultan para no tapar el gancho. */
+export const TeaserContext = createContext(false);

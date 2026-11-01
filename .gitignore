@@ -5,3 +5,4 @@ public/jobs/*
 output/*
 !output/.gitkeep
 .remotion/
+public/audio/

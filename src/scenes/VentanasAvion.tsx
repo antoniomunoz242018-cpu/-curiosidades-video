@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {interpolate} from 'remotion';
 import type {SceneProps} from './types';
-import {beat, clamp, easeOut, prog, window01} from './helpers';
+import {beat, clamp, easeOut, prog, window01, TeaserContext} from './helpers';
 
 // ---------- Piezas reutilizables ----------
 const Plane: React.FC<{rounded: boolean; stripe: string; split?: number}> = ({rounded, stripe, split = 0}) => {
@@ -30,8 +30,9 @@ const Plane: React.FC<{rounded: boolean; stripe: string; split?: number}> = ({ro
 };
 
 const Chip: React.FC<{text: string; y: number; t: number; at: number; until?: number; color: string; ink?: string}> = ({text, y, t, at, until = 1e9, color, ink = '#0b1214'}) => {
+  const teaser = useContext(TeaserContext);
   const o = window01(t, at, until, .3);
-  if (o <= 0) return null;
+  if (o <= 0 || teaser) return null;
   const k = prog(t, at, at + .35, easeOut);
   const w = text.length * 25 + 70;
   return <g transform={`translate(540 ${y}) scale(${.7 + .3 * k})`} opacity={o}>
