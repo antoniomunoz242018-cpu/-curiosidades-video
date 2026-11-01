@@ -56,7 +56,7 @@ export const CajaNegra: React.FC<SceneProps> = ({time: t, captions, duration}) =
       {t > T.presion && [0, 45, 90, 135, 180, 225, 270, 315].map(a => <g key={a} transform={`translate(540 820) rotate(${a}) translate(${300 - 20 * Math.sin(t * 5)} 0)`} opacity={prog(t, T.presion, T.presion + .4)}>
         <path d="M 40 0 H -20" stroke={CYAN} strokeWidth="12" strokeLinecap="round"/><path d="M -16 -18 L -44 0 L -16 18 Z" fill={CYAN}/>
       </g>)}
-      <BigText text="+1000°" y={540} t={t} at={T.fuego} until={T.presion} size={130} color="#ff8a3d"/>
+      <BigText text="+1000°" y={640} t={t} at={T.fuego} until={T.presion} size={130} color="#ff8a3d"/>
     </Shot>
     {/* 5. Voces y datos */}
     <Shot t={t} from={T.voces - .2} to={duration + 1} cy={760}>

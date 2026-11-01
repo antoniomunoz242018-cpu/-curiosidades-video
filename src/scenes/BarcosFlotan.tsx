@@ -70,9 +70,9 @@ export const BarcosFlotan: React.FC<SceneProps> = ({time: t, captions, duration}
     {/* 5. Arquímedes */}
     <Shot t={t} from={T.arquimedes - .2} to={duration + 1} cy={760}>
       <Water t={t}/>
-      <Hull x={540} w={560} draft={20}/>
-      <BigText text="ARQUÍMEDES" y={560} t={t} at={T.arquimedes} size={110} color={YELLOW}/>
-      <Label x={540} y={640} text="HACE MÁS DE 2000 AÑOS" size={40} o={prog(t, T.arquimedes + .4, T.arquimedes + .8)}/>
+      <Hull x={540} w={560} draft={110}/>
+      <BigText text="ARQUÍMEDES" y={500} t={t} at={T.arquimedes} size={110} color={YELLOW}/>
+      <Label x={540} y={570} text="HACE MÁS DE 2000 AÑOS" size={40} o={prog(t, T.arquimedes + .4, T.arquimedes + .8)}/>
     </Shot>
 
     <Chip text="EL SECRETO ES LA FORMA" y={330} t={t} at={T.forma} until={T.empuja} color={YELLOW}/>

@@ -40,10 +40,10 @@ export const PuentesJuntas: React.FC<SceneProps> = ({time: t, captions, duration
     <Shot t={t} from={T.calor - .2} to={T.rigida} cy={760}>
       <Bridge grow={season} glowJoints={1}/>
       <g transform="translate(900 560)">
-        {season > 0 ? <g><circle r={60} fill="#ffcc00"/>{Array.from({length: 8}, (_, i) => <line key={i} x1={0} y1={-80} x2={0} y2={-105} stroke="#ffcc00" strokeWidth="8" transform={`rotate(${i * 45 + t * 30})`}/>)}</g>
+        {t < T.frio ? <g><circle r={60} fill="#ffcc00"/>{Array.from({length: 8}, (_, i) => <line key={i} x1={0} y1={-80} x2={0} y2={-105} stroke="#ffcc00" strokeWidth="8" transform={`rotate(${i * 45 + t * 30})`}/>)}</g>
           : <g stroke={CYAN} strokeWidth="10" strokeLinecap="round">{[0, 60, 120].map(a => <line key={a} x1={0} y1={-70} x2={0} y2={70} transform={`rotate(${a})`}/>)}</g>}
       </g>
-      <Label x={540} y={700} text={season > 0 ? 'SE ESTIRA' : 'SE ENCOGE'} color={season > 0 ? '#ffcc00' : CYAN} size={56}/>
+      <Label x={540} y={700} text={t < T.frio ? 'SE ESTIRA' : 'SE ENCOGE'} color={t < T.frio ? '#ffcc00' : CYAN} size={56}/>
       <Label x={540} y={1240} text="HASTA DECENAS DE CENTÍMETROS" size={36} o={prog(t, T.centimetros, T.centimetros + .4)}/>
     </Shot>
     {/* 3. Sin juntas: se agrieta */}

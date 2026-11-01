@@ -52,11 +52,11 @@ export const BicicletaEquilibrio: React.FC<SceneProps> = ({time: t, captions, du
     {/* 1. Parada se cae; en movimiento no */}
     <Shot t={t} from={-1} to={T.trompo} cy={760}>
       <rect x={0} y={GROUND} width={1080} height={120} fill="#2b2f36"/>
-      <g transform={`translate(300 ${GROUND}) rotate(${-80 * fall})`}>
+      <g transform={`translate(300 ${GROUND}) rotate(${-80 * fall}) scale(1.5)`}>
         <rect x={-10} y={-300} width={20} height={300} fill="#2f7fd8"/><rect x={-12} y={-300} width={24} height={300} rx={10} fill="#15171b" opacity=".9"/>
         <line x1={-70} y1={-300} x2={70} y2={-300} stroke="#3b434c" strokeWidth="14" strokeLinecap="round"/>
       </g>
-      <g transform={`translate(760 ${GROUND}) rotate(${Math.sin(t * 3) * 3})`}>
+      <g transform={`translate(760 ${GROUND}) rotate(${Math.sin(t * 3) * 3}) scale(1.5)`}>
         <rect x={-12} y={-300} width={24} height={300} rx={10} fill="#15171b"/>
         <line x1={-70} y1={-300} x2={70} y2={-300} stroke="#3b434c" strokeWidth="14" strokeLinecap="round"/>
       </g>

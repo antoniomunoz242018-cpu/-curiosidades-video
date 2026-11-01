@@ -33,8 +33,8 @@ export const LlantasAvion: React.FC<SceneProps> = ({time: t, captions, duration}
       {[['AUTO', 32, '#8c96a0'], ['AVIÓN', 200, YELLOW]].map(([l, v, c], i) => {
         const k = prog(t, T.infladas + i * .4, T.infladas + i * .4 + 1, easeOut);
         return <g key={l as string} transform={`translate(${310 + i * 460} 860)`}>
-          <rect x={-70} y={-440} width={140} height={440} rx={20} fill="#1d3550"/>
-          <rect x={-70} y={-440 * (v as number) / 200 * k} width={140} height={440 * (v as number) / 200 * k} rx={20} fill={c as string}/>
+          <rect x={-70} y={-380} width={140} height={380} rx={20} fill="#1d3550"/>
+          <rect x={-70} y={-380 * (v as number) / 200 * k} width={140} height={380 * (v as number) / 200 * k} rx={20} fill={c as string}/>
           <Label x={0} y={60} text={l as string} size={40}/>
           <Label x={0} y={-460 * (v as number) / 200 * k - 20} text={`${Math.round((v as number) * k)} PSI`} size={38} color={c as string}/>
         </g>;
@@ -60,7 +60,7 @@ export const LlantasAvion: React.FC<SceneProps> = ({time: t, captions, duration}
         const p = (t * 1.5 + i / 10) % 1;
         return <circle key={i} cx={470 - p * 300} cy={950 - p * 60} r={20 + p * 40} fill="#c9ced3" opacity={.5 * (1 - p)}/>;
       })}
-      <BigText text="+250 KM/H" y={560} t={t} at={T.aterrizajes + .3} size={130} color={YELLOW}/>
+      <BigText text="+250 KM/H" y={650} t={t} at={T.aterrizajes + .3} size={110} color={YELLOW}/>
       <Mark ok x={880} y={1100} t={t} at={T.aterrizajes + 1.2}/>
     </Shot>
 

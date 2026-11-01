@@ -16,7 +16,7 @@ export const Alcantarillas: React.FC<SceneProps> = ({time: t, captions, duration
   const B = beats(captions, duration);
   const T = {cuadrada: B('cuadrada', .16), diagonal: B('diagonal', .28), circulo: B('circulo', .36), direcciones: B('direcciones', .44),
     rodandola: B('rodandola', .58), acomodarla: B('acomodarla', .7), abajo: B('abajo', .86)};
-  const H = 300; // ancho del agujero
+  const H = 420; // ancho del agujero
   const alignSq = prog(t, T.cuadrada + .4, T.diagonal, easeOut);
   const drop = prog(t, T.diagonal + .2, T.diagonal + 1.4);
 
@@ -34,7 +34,7 @@ export const Alcantarillas: React.FC<SceneProps> = ({time: t, captions, duration
       <g transform={`translate(540 760) rotate(${45 * alignSq}) scale(${1 - .7 * drop})`} opacity={1 - drop}>
         <rect x={-H / 2} y={-14} width={H} height={28} rx={4} fill={IRON} stroke={IRON_D} strokeWidth="5"/>
       </g>
-      <Label x={540} y={1010} text="CABE DE LADO" color={RED} size={44} o={prog(t, T.diagonal, T.diagonal + .4)}/>
+      <Label x={540} y={1060} text="CABE DE LADO" color={RED} size={44} o={prog(t, T.diagonal, T.diagonal + .4)}/>
       <Mark ok={false} x={880} y={560} t={t} at={T.diagonal + 1} until={T.circulo}/>
     </Shot>
     {/* 3. Círculo: mide lo mismo en todas direcciones */}
@@ -47,7 +47,7 @@ export const Alcantarillas: React.FC<SceneProps> = ({time: t, captions, duration
       {window01(t, T.direcciones, T.rodandola) > 0 && <g opacity={window01(t, T.direcciones, T.rodandola)} transform={`translate(540 760) rotate(${t * 70 + 90})`}>
         <line x1={-H / 2} y1={0} x2={H / 2} y2={0} stroke={CYAN} strokeWidth="6"/>
       </g>}
-      <Label x={540} y={1010} text="NUNCA CABE" color={GREEN} size={44} o={prog(t, T.circulo + .5, T.circulo + .9)}/>
+      <Label x={540} y={1060} text="NUNCA CABE" color={GREEN} size={44} o={prog(t, T.circulo + .5, T.circulo + .9)}/>
       <Mark ok x={880} y={560} t={t} at={T.direcciones + .4} until={T.rodandola}/>
     </Shot>
     {/* 4. Se mueve rodando */}
@@ -55,9 +55,9 @@ export const Alcantarillas: React.FC<SceneProps> = ({time: t, captions, duration
       <line x1={0} y1={940} x2={1080} y2={940} stroke="#5c6670" strokeWidth="8"/>
       {(() => {
         const k = prog(t, T.rodandola, T.acomodarla, easeOut), x = 180 + 700 * k;
-        return <g transform={`translate(${x} 790)`}>
-          <ellipse rx={30} ry={150} fill={IRON} stroke={IRON_D} strokeWidth="8"/>
-          <line x1={0} y1={-150} x2={0} y2={150} stroke={IRON_D} strokeWidth="6" transform={`scale(.2 1) rotate(${k * 900})`}/>
+        return <g transform={`translate(${x} 730)`}>
+          <ellipse rx={40} ry={210} fill={IRON} stroke={IRON_D} strokeWidth="8"/>
+          <line x1={0} y1={-210} x2={0} y2={210} stroke={IRON_D} strokeWidth="6" transform={`scale(.2 1) rotate(${k * 900})`}/>
         </g>;
       })()}
       <Label x={540} y={1060} text="DECENAS DE KILOS" size={44} o={prog(t, T.rodandola + .3, T.rodandola + .7)}/>

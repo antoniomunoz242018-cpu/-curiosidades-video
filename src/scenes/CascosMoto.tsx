@@ -17,6 +17,7 @@ export const CascosMoto: React.FC<SceneProps> = ({time: t, captions, duration}) 
   const B = beats(captions, duration);
   const T = {aire: B('aire', .1), trescientos: B('trescientos', .18), levantar: B('levantar', .3), alargada: B('alargada', .4), aleta: B('aleta', .48, 0),
     lisa: B('lisa', .66), caida: B('caida', .74), deslizarse: B('deslizarse', .8), cuello: B('cuello', .92, 0)};
+  T.alargada = B('alargada', .4, T.levantar); // «forma alargada» ya aparece en la primera frase
   T.aleta = B('aleta', .48, T.alargada);
   T.cuello = B('cuello', .92, T.caida);
   const flow = (smooth: boolean) => Array.from({length: 7}, (_, i) => {

@@ -39,9 +39,9 @@ export const BotellasRelieves: React.FC<SceneProps> = ({time: t, captions, durat
     {/* Lisa se aplasta; con anillos aguanta */}
     <Shot t={t} from={T.delgado - .2} to={T.refresco} cy={760}>
       {[300, 780].map((x, i) => <g key={x}>
-        <g transform={`translate(${x} ${800 + (i ? 0 : 60 * crush)}) scale(.85)`}><Bottle ribs={i === 1} crush={i ? 0 : crush} glow={i && t > T.anillos ? 1 : 0}/></g>
-        <g transform={`translate(${x} ${430 + (i ? 0 : 110 * crush)})`} opacity={prog(t, T.delgado, T.delgado + .4)}>
-          {[0, 1, 2].map(k => <rect key={k} x={-110} y={-k * 54} width={220} height={48} rx={10} fill="#5c6f84" stroke="#3b4a5a" strokeWidth="3"/>)}
+        <g transform={`translate(${x} ${870 + (i ? 0 : 60 * crush)}) scale(.85)`}><Bottle ribs={i === 1} crush={i ? 0 : crush} glow={i && t > T.anillos ? 1 : 0}/></g>
+        <g transform={`translate(${x} ${505 + (i ? 0 : 110 * crush)})`} opacity={prog(t, T.delgado, T.delgado + .4)}>
+          {[0, 1, 2].map(k => <rect key={k} x={-110} y={-k * 44} width={220} height={40} rx={10} fill="#5c6f84" stroke="#3b4a5a" strokeWidth="3"/>)}
         </g>
       </g>)}
       <Mark ok={false} x={300} y={1180} t={t} at={T.aplastaria + .5} until={T.refresco} size={70}/>

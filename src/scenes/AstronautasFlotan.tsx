@@ -57,8 +57,7 @@ export const AstronautasFlotan: React.FC<SceneProps> = ({time: t, captions, dura
           return <circle key={i} cx={120 * v * k * (1 + i)} cy={-(ER + 120) + 120 * k * k} r={12} fill={RED}/>;
         })}
       </g>
-      <Label x={540} y={530} text="28 000 KM/H" color={YELLOW} size={64} o={prog(t, T.veintiocho, T.veintiocho + .4)}/>
-      {t > T.hora && <Label x={540} y={1220} text="UNA VUELTA CADA 90 MIN" color={CYAN} size={44}/>}
+      <Label x={540} y={530} text={t > T.hora ? 'UNA VUELTA = 90 MIN' : '28 000 KM/H'} color={t > T.hora ? CYAN : YELLOW} size={64} o={prog(t, T.veintiocho, T.veintiocho + .4)}/>
     </Shot>
     {/* 4. Como un elevador que cae y nunca llega */}
     <Shot t={t} from={T.misma - .2} to={duration + 1} cy={760}>

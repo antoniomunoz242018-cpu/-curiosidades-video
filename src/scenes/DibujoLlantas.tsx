@@ -47,7 +47,7 @@ export const DibujoLlantas: React.FC<SceneProps> = ({time: t, captions, duration
       <g transform={`translate(540 ${700 - 60 * lift}) rotate(${t * 200})`}>
         <circle r={250} fill="#15171b"/><circle r={130} fill="#8c96a0"/><circle r={40} fill="#3b434c"/>
       </g>
-      <Label x={540} y={560} text="ACUAPLANEO" color={RED} size={64} o={prog(t, T.acuaplaneo, T.acuaplaneo + .4)}/>
+      <Label x={540} y={1100} text="ACUAPLANEO" color={RED} size={64} o={prog(t, T.acuaplaneo, T.acuaplaneo + .4)}/>
       <Mark ok={false} x={880} y={500} t={t} at={T.acuaplaneo} until={T.canales}/>
     </Shot>
     {/* 3. Los canales sacan el agua */}
