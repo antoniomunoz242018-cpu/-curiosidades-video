@@ -19,6 +19,25 @@ import {MonedasRanuras} from './scenes/MonedasRanuras';
 import {Garrafon} from './scenes/Garrafon';
 import {PruebaUna} from './scenes/PruebaUna';
 import {MotoGPLlantas} from './scenes/MotoGPLlantas';
+import {AvionesPlanean} from './scenes/AvionesPlanean';
+import {Winglets} from './scenes/Winglets';
+import {F1Pegados} from './scenes/F1Pegados';
+import {TrenesFrenar} from './scenes/TrenesFrenar';
+import {Helicoptero} from './scenes/Helicoptero';
+import {LlantasAvion} from './scenes/LlantasAvion';
+import {Semaforos} from './scenes/Semaforos';
+import {Alcantarillas} from './scenes/Alcantarillas';
+import {PuentesJuntas} from './scenes/PuentesJuntas';
+import {BarcosFlotan} from './scenes/BarcosFlotan';
+import {Paracaidas} from './scenes/Paracaidas';
+import {CascosMoto} from './scenes/CascosMoto';
+import {Cinturon} from './scenes/Cinturon';
+import {BotellasRelieves} from './scenes/BotellasRelieves';
+import {CablesCuelgan} from './scenes/CablesCuelgan';
+import {CajaNegra} from './scenes/CajaNegra';
+import {DibujoLlantas} from './scenes/DibujoLlantas';
+import {AstronautasFlotan} from './scenes/AstronautasFlotan';
+import {BicicletaEquilibrio} from './scenes/BicicletaEquilibrio';
 
 /**
  * Escenas animadas con código (sin imágenes). Para añadir un tema nuevo, crea su componente en src/scenes/
@@ -41,6 +60,25 @@ export const SCENES: Record<string, Meta> = {
   'garrafon': {C: Garrafon, climax: (c, d) => beat(c, 'doblaria', d * .26) + .2},
   'prueba-una': {C: PruebaUna, climax: (c, d) => beat(c, 'linterna', d * .8) + .5},
   'motogp-llantas': {C: MotoGPLlantas, climax: () => 2.6},
+  'aviones-planean': {C: AvionesPlanean, climax: (c, d) => beat(c, 'hudson', d * .86) + .8},
+  'winglets': {C: Winglets, climax: (c, d) => beat(c, 'remolino', d * .36) + .8},
+  'f1-pegados': {C: F1Pegados, climax: (c, d) => beat(c, 'techo', d * .66) + .8},
+  'trenes-frenar': {C: TrenesFrenar, climax: (c, d) => beat(c, 'bloquearian', d * .5) + .6},
+  'helicoptero': {C: Helicoptero, climax: (c, d) => beat(c, 'giraria', d * .52) + .4},
+  'llantas-avion': {C: LlantasAvion, climax: (c, d) => beat(c, 'aterrizajes', d * .82) + 1},
+  'semaforos': {C: Semaforos, climax: (c, d) => beat(c, 'niebla', d * .4) + .3},
+  'alcantarillas': {C: Alcantarillas, climax: (c, d) => beat(c, 'diagonal', d * .28) + .7},
+  'puentes-juntas': {C: PuentesJuntas, climax: (c, d) => beat(c, 'agrietarse', d * .6) + .4},
+  'barcos-flotan': {C: BarcosFlotan, climax: (c, d) => beat(c, 'entra', d * .7) + 1.2},
+  'paracaidas': {C: Paracaidas, climax: (c, d) => beat(c, 'abierto', d * .46) + .3},
+  'cascos-moto': {C: CascosMoto, climax: (c, d) => beat(c, 'levantar', d * .3) + .3},
+  'cinturon': {C: Cinturon, climax: (c, d) => beat(c, 'dientes', d * .46) - .3},
+  'botellas-relieves': {C: BotellasRelieves, climax: (c, d) => beat(c, 'aplastaria', d * .24) + .3},
+  'cables-cuelgan': {C: CablesCuelgan, climax: (c, d) => beat(c, 'reventar', d * .54) + .1},
+  'caja-negra': {C: CajaNegra, climax: (c, d) => beat(c, 'fuego', d * .58) + .2},
+  'dibujo-llantas': {C: DibujoLlantas, climax: (c, d) => beat(c, 'acuaplaneo', d * .34) + .2},
+  'astronautas-flotan': {C: AstronautasFlotan, climax: (c, d) => beat(c, 'hora', d * .6) + .5},
+  'bicicleta-equilibrio': {C: BicicletaEquilibrio, climax: () => 1.2},
 };
 /** Duración del avance inicial con el clímax antes de que empiece la historia. */
 export const TEASER = 1.4;
